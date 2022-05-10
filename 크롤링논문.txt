@@ -1,0 +1,108 @@
+Natural Language Process 키워드 추출을 통한 신문기사 크롤링 데이터 활용
+
+많은 신문정보데이터들이 인터넷을 통해 서로 공유하고 있는 상황에서 더 빠르고 정확하게 키워드를 추출하여
+다른 기사를 작성할 때 도움을 주고자 한다.
+
+php 파일인 크롤링 소스 simple_html_dom.php를 활용하여 매일경제, 중앙일보, 조선일보, 연합뉴스, 
+YTN, 네이버뉴스 등의 신문기사 데이터 추출
+NLP활용을 통해 각 데이터에 대한 키워드 추출
+-> TextRank 를 활용한 키워드 추출 알고리즘
+
+=> 크롤링중 링크연결이 잘못됐을경우 오류가 떠서 문제발생이 가능.... 운영팀이 계속 어드민을 관리할 필요가 없지만 링크 주소 
+확실하게 확인이 필요
+
+ - 기사 본문이 필요없는 속도가 중요한 속보의경우 다른사이트를 참고해서 1분이내에 작성할 수 있도록 도울수 있지 않을까?
+네이버뉴스 홈페이지, 연합뉴스, 빅카인즈 등을 비교해봤을때 각 언론사 홈페이지 속보검색이 가장 빠름.
+특히 빅카인즈는 크롤링이 되지 않아 정보수집 어렵고 타 사이트에 비교해볼때 빠르지 않음
+https://www.bigkinds.or.kr/v2/news/recentNews.do
+
+https://www.mk.co.kr/beijingTest/crawling/press_list/breaking_news.php
+
+네이버 랭킹뉴스 조회수별 기사제목 전달로 현재 인기있는 토픽 기자들에게 추천할 수 있지 않을까
+https://www.mk.co.kr/beijingTest/crawling/press_list/naver_rank.php(조회수별 나오는 상태가 아님, 댓글랭킹에서 각 기사별 페이지 접근 후 댓글수 확인으로 순서배열 필요)
+
+
+
+  - 오늘 기사들을 종합해서 각 기사 제목에서 토픽추출 후 사람들에게 실시간 토픽을 과거 네이버 실시간 검색어 처럼 추천할 수 있지 않을까?
+구글 colab통해서 단어 추출, 형태소 분석 돌려봤는데.... 신문기사내용에서 가장 중요한 토픽을 뽑아내는게 어려움....
+예를들어서 
+
+	<< "속보 서울시 민주노총 13일 결의대회 집회금지 통보"," 매일경제 2022년 04월 08일 15:35:33 ", >>
+
+여기서 단어추출을 할 경우 민주노총이라는 단어가 가장 중요한데, 단어를 강조할 방법을 찾아야함
+또한 형태소추출을 할 경우 한자어는 1개씩 끊어져버리기 때문에 형태소 추출은 무의미...
+단어추출 -> 서울시 / 민주노총 / 13일 / 결의대회 / 집회금지 / 통보   <== 여기서 가장 중요한 민주노총->결의대회->금지 이런 순서로.... 추출이 필요
+형태소추출-> 서울/시/민주/노총/1/3/일/결의/대/회/집/회/금/지/통보 <=== 신문기사 자체가 한자어가 많아서 형태소 추출은 무의미.... 단어 추출에 집중하는게 필요
+
+
+https://zum.com/			=> 줌의 경우 실시간검색어 제공 및 실시간 주요 주식종목 또한 추천하기에 우리회사에서 필요로하는 데이터가 많음
+https://www.naver.com/		=> 네이버는 과거 실시간검색어 제공하다가 사회적 부담을 느껴서 삭제했는데 자체 웹브라우저인 whale에서 따로 설정시 실시간검색어 볼 수 있도록 하고있음
+						(원하는사람이 직접 찾도록유도)
+
+
+키워드추출 -> 파이썬통해서 만드는방법 적용 필요 키워드추출은 단어추출보다 더 중요성있는 단어를 선별해서 판단하기 쉬움 -> 기사 검색시 추천 단어 등에 활용
+  -> 단순히 실시간검색어는 정제되지 않은 검색어가 올라갈 수 있는 반면에 뉴스데이터를 통한 토픽추출은 정제된 단어가 올라가고 신뢰성이 높은 데이터
+
+
+simple_html_dom.php
+-> php로 이루어진 웹 크롤링 소스/ 
+-> 빠르고 간단한 HTML 파서
+-> PHP4에 기반한 S.C. Chen이 작성한 소스
+
+
+현대사회는 데이터와 정보의양은 크고 중요하다. 우리는 자연어처리모델을 조금 더 
+정교하고 정확하게 수행하는 머신러닝 모델을 원한다. 더 나은 수행을 하는 모델을 위해
+다양한 데이터분석기술 예를들어, stop words삭제, stemming and lemmatizing the word와 같은
+기술들이 필요하다 하지만 이 경우 데이터와 정보의 양이 너무나 거대하다 예를들어
+거대한양의 단어가 사용된 리뷰에있어서 우리는 모든 리뷰를 다 살펴볼수 없다
+그리고 우리는 그 단어들을 요약하는방법을 필요로한다. 거기서 우리는 그 정보들을
+훑어볼수 있다. 그 text rank알고리즘은 거대한 데이터를 자동적으로 요약한다.
+이것은 패키지로 사용될뿐만아니라 요약을 대신해서 키워드를 추출하고
+구절을 rank화 시킬수 있다. 간단한방법으로 정보의 요약을 수행하면서 말이다.
+
+textrank는 그래프에 기반한 구글 페이지링크 알고리즘이다. 우리는
+textrank를 좀 더 키워드 추출과 텍스트 요약에 많이 사용할것이다. 기본적으로
+textrank알고리즘에서 우리는 2개이상의 단어들의 관계를 측정할 것이다.
+
+w1, w2, w3, w4의 구문들을 가정해보자 우리는 구문에서 일어나는  그들 사이으 ㅏ관계에 대해
+대해 테이블로 표시할 수 있다.
+
+
+
+!pip install summa
+from summa import summarizer
+from summa import keywords
+print(summarizer.summarize(text))
+!pip install pytextrank
+!python -m spacy download en_core_web_sm
+print(keywords.keywords(text))
+summarizer.summarize(text, ratio = 0.5)
+summarizer.summarize(text, words = 50)
+!python -m spacy download en_core_web_sm
+import pandas as pd
+import spacy
+import pytextrank
+document = "~fsfsf~"
+en_nlp = spacy.load("en_core_web_sm")
+en_nlp.add_pipe("textrank")
+en_nlp
+doc = en_nlp(document)
+tr = doc._.textrank
+print(tr.elapsed_time);
+for combination in doc._.phrases:
+	print(combination.text, combination.rank, combination.count)
+document = pd.read_csv('/content/drive/MyDrive/Yugesh/textrank/yelp_labelled.txt', name=['sentence', 'label'], sep='\t')
+
+import pathlib
+text = pathlib.Path("/content/drive/MyDrive/Yugesh/textrank/yelp_labelled.txt").read_text()
+text
+
+en_nlp = spacy.load("en_core_web_sm")
+en_nlp.add_pipe("textrank", config={"stopwords": { "word":["NOUN"]}})
+
+doc = en_nlp(text)
+
+for phrase in doc._.phrases[:5]:
+	print(phrase)
+
+!pip install "altair"
